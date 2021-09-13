@@ -32,24 +32,23 @@ router.post('/post', (req,res) => {
 
 router.post('/api/order', (req,res) => {
     let MenuID = req.body.MenuID;
-    let item = db.query(`(Select menu from Menu where menu_id=${MenuID})`);
-    let Price = `(Select Price from Menu where menu_id=${MenuID})`;
     let quantity = req.body.quantity;
     
-    let sql = "INSERT into order_list (MenuID,quantity) values (?,?)";
-
-
-
-    // let sql = `INSERT into order_list (item) values (Select menu from Menu where menu_id=${MenuID})`;
-    // let sql = `INSERT into order_list (Price) values (Select menu from Menu where Price=${Price})`;
-    // let sql = "INSERT into order_list (quantity) values (?)";
-    // let select = db.query(`select (menu, price) from Menu where menu_id=${MenuID}`);
+    let sql = "INSERT INTO order_list (MenuID,quantity) VALUES (?,?)";
     
     db.query(sql,[MenuID,quantity], function (err, result, fields) { 
         if (err) throw err;
         if (result.length != 0) {
             res.json(result);
         }
+    });   
+})
+
+router.get('/api/orderlist', (req,res) => {
+    let sql = "SELECT Order_List.OrderId, Order_List.MenuID, Menu.menu as Item, Order_List.quantity, Menu.price from Order_List Inner JOIN Menu on Order_List.MenuID=Menu.menu_id";
+    db.query(sql, function (err, result, fields) { 
+        if (err) throw err;
+        res.json(result);
     });   
 })
 

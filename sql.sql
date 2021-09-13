@@ -44,3 +44,15 @@ create table Order_List (
 );
 create table Order_List as 
 (select menu from Menu where menu_id = 101), OrderId int(11) auto_increment;
+
+create table Order_List (
+    OrderId int(11) auto_increment, 
+    MenuID int(3),
+    quantity int(11),
+    Primary key (OrderId, MenuID)
+);
+
+
+SELECT Order_List.OrderId, Order_List.MenuID, Menu.menu as Item, Order_List.quantity, Menu.price from Order_List Inner JOIN Menu on Order_List.MenuID=Menu.menu_id;
+
+SELECT Order_List.OrderId, Order_List.MenuID from Order_List
