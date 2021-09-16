@@ -11,7 +11,7 @@ const db = mysql.createConnection({
 
 // const pool = new qb(settings, 'mysql', 'pool');
 
-db.connect(qb, function(err) {
+db.connect(db, function(err) {
     if (err) console.log('failed to connect');
     if (!err) console.log('Connected to mysql Database');
 })

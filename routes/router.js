@@ -3,8 +3,6 @@ const router = express.Router();
 require('dotenv').config();
 var db = require('../config/database');
 
-var getmenuid = require('../data/menuid');
-
 
 router.get('/get', (req,res) => {
     let sql = "SELECT * FROM category";
