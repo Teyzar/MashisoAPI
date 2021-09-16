@@ -4,6 +4,9 @@ const router = express.Router();
 require('dotenv').config();
 var db = require('../config/database');
 
+var getmenuid = require('../data/menuid');
+
+
 router.get('/get', (req,res) => {
     let sql = "SELECT * FROM category";
     db.query(sql, function (err, result, fields) { 
@@ -30,34 +33,46 @@ router.post('/post', (req,res) => {
     }); 
 })
 
-router.post('/api/order', (req,res) => {
+router.post('/api/order', function (req,res, err)  {
     let MenuID = req.body.MenuID;
     let quantity = req.body.quantity;
     
     let sql = "INSERT INTO order_list (MenuID,quantity) VALUES (?,?)";
-    
-    db.query(sql,[MenuID,quantity], function (err, result, fields) { 
-        if (err) throw err;
-        if (result.length != 0) {
-            res.json(result);
-        }
-    });   
-})
+
+    // var menuidlist = getmenuid();
+ 
+    return console.log(menuid);
+    // let i = 0; 
+    // for (i = 0; i < menuidJson.length; i++) {
+    //     if (MenuID === menuidJson) {
+    //         db.query(sql,[MenuID,quantity], function (err, result, fields) { 
+    //             if (err) throw err;
+    //             res.json(result);
+    //         });  
+    //     }else{  
+    //         // res.send({msg: "error" });
+    //         return res.json("err");
+    //     }
+    // }
+}) 
 
 router.get('/api/orderlist', (req,res) => {
+
     let sql = "SELECT Order_List.OrderId, Order_List.MenuID, Menu.menu as Item, Order_List.quantity, Menu.price from Order_List Inner JOIN Menu on Order_List.MenuID=Menu.menu_id";
     db.query(sql, function (err, result, fields) { 
         if (err) throw err;
         res.json(result);
-    });   
+    });    
+ 
+    
 })
-
-
+    
+ 
 
 router.get('/get/category/:CategoryID', (req, res) => {
 
     let id = req.params.CategoryID;
-    let sql = "SELECT * FROM category WHERE CategoryID=?";
+    let sql = "SELECT * FROM category WHERE CategoryID=?";  
 
     db.query(sql, id, function(err, result, fields) {
         if (err) throw err;
@@ -74,7 +89,9 @@ router.get('/api/menu/:menu_id', (req,res)  => {
     })
 })
 router.get('/api/menu', (req,res)  => {
-    let sql = "SELECT * FROM menu";
+    let sql = db.select('*').get();
+
+    return res.send(sql);
     db.query(sql,function(err, result, fields) {
         if (err) throw err;
         res.send(result);

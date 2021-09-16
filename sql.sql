@@ -56,3 +56,8 @@ create table Order_List (
 SELECT Order_List.OrderId, Order_List.MenuID, Menu.menu as Item, Order_List.quantity, Menu.price from Order_List Inner JOIN Menu on Order_List.MenuID=Menu.menu_id;
 
 SELECT Order_List.OrderId, Order_List.MenuID from Order_List
+
+Create table Transcation_orders (
+    id int(11) auto_increment,
+    
+)
