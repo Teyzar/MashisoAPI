@@ -86,11 +86,11 @@ router.get('/api/menu/:menu_id', (req,res)  => {
     })
 })
 router.get('/api/menu', (req,res)  => {
-    // db.query(sql,function(err, result, fields) {
-    //     if (err) throw err;
-    //     res.send(result);
-    // })
-    res.send("hello word");
+    let sql = "SELECT * from Menu";
+    db.query(sql,function(err, result, fields) {
+        if (err) throw err;
+        res.send(result);
+    })
 })
 
 module.exports = router;           
