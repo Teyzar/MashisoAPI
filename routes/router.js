@@ -128,16 +128,46 @@ router.get('/api/menu/:menu_id', (req, res) => {
 })
 
 //sales per transaction_id
-// router.get('/api/sales/:transaction_id', (req,res) => {
-//     let transaction_id = req.params.transaction_id;
-//     let sql = "SELECT transaction_id, transaction_table.menu_id, Menu.price, transaction_table.quantity FROM transaction_table JOIN Menu ON transaction_table.menu_id=Menu.menu_id WHERE transaction_table.transaction_id=1"
-//     db.query(sql,transaction_id,function (err, result, fields) { 
-//         if (err) throw err;
-//         res.json(result);
-//     });    
-//     // GROUP BY transaction_table.transaction_id
-// })
+router.get('/api/sales/:transaction_id', (req,res) => {
+    let transaction_id = req.params.transaction_id;
+    let sql = `
+    SELECT 
+        transaction_table.transaction_id, transaction_table.menu_id, Menu.price, sum(transaction_table.quantity) as quantity, (Menu.Price*(sum(transaction_table.quantity))) as 'Total each'
+    FROM 
+        transaction_table
+    INNER JOIN
+        Menu
+    ON
+        transaction_table.menu_id=Menu.menu_id
+    WHERE
+        transaction_table.transaction_id = ${transaction_id}
+    GROUP by
+        transaction_table.menu_id, transaction_table.quantity`;
 
+    db.query(sql,function (err, result, fields) { 
+        if (err) throw err;
+        res.json(result);
+    });    
+}) 
+
+//getting all sales
+router.get('/api/sales', (req,res) => {
+    let transaction_id = req.params.transaction_id;
+    let sql = `
+    SELECT 
+    id,transaction_id, transaction_table.menu_id, Menu.price, transaction_table.quantity, (Menu.Price*(transaction_table.quantity)) as 'Total'
+    FROM
+        transaction_table
+    INNER JOIN
+        Menu
+    ON 
+        transaction_table.menu_id=Menu.menu_id`;
+
+    db.query(sql,function (err, result, fields) { 
+        if (err) throw err;
+        res.json(result);
+    });    
+}) 
 
 
 module.exports = router;

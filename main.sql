@@ -268,3 +268,52 @@ values
 (9,	"Fried porkchop",	140),
 (9,	"Spicy chicken fillet",	165),
 (9,	"Fried chicken fillet",	140);
+<<<<<<< HEAD:main.sql
+=======
+
+create table Category (
+    CategoryID int(11) auto_increment,
+    CategoryName varchar(255),
+    Primary key (CategoryID)
+);
+
+insert into 
+    Category (CategoryName) 
+    values 
+    ('Samgyupsal'),
+    ('Set meal'),
+    ('Chicken'),
+    ('Pulutan'),
+    ('Fries'),
+    ('Mandu'),
+    ('Special dish');
+
+insert into 
+    Menu (CategoryID, Menu, Price) 
+values
+    ('1','Plain','350'),
+    ('1','Bulgogi','380'),
+    ('1','Spicy','390'),
+    ('1','100g chicken fillet','400');
+
+
+SELECT Order_List.OrderId, Order_List.MenuID from Order_List
+
+Create table transaction_orders (
+    id int(11) auto_increment,
+    transaction_id int(11),
+    (SELECT menu_id FROM menu),
+    quantity int(11),
+    Primary key (id, menu_id)
+);
+
+CREATE TABLE transaction_table (
+    id int(11) auto_increment,
+    transaction_id int(11),
+    menu_id int(3),
+    quantity int(11),
+    transaction_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+    Primary key (id, menu_id)
+);
+
+>>>>>>> e0b37be2e303cb0d670ee92ce20fc3e1f9789891:sql.sql
