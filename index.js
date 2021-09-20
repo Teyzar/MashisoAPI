@@ -13,3 +13,6 @@ const port = process.env.PORT || 3000;
 
 app.listen(port);
 
+
+//npm start
+//lt --port 3000 --subdomain mashiso

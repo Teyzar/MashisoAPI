@@ -1,11 +1,11 @@
 create table Category (
-    CategoryID int(11) auto_increment,
-    CategoryName varchar(255),
-    Primary key (CategoryID)
+    categoryID int(11) auto_increment,
+    categoryName varchar(255),
+    Primary key (categoryID)
 );
 
 insert into 
-    Category (CategoryName) 
+    Category (categoryName) 
     values 
     ('Samgyupsal'),
     ('Set meal'),
@@ -17,49 +17,40 @@ insert into
     ('Special dish'),
     ('Rice Meal');
 
-insert into 
-    Menu (CategoryID, Menu, Price) 
-values
-    ('1','Plain','350'),
-    ('1','Bulgogi','380'),
-    ('1','Spicy','390'),
-    ('1','100g chicken fillet','400');
-
-
 SELECT Order_List.OrderId, Order_List.MenuID from Order_List
 
-Create table transaction_orders (
+Create table Transaction_orders (
     id int(11) auto_increment,
-    transaction_id int(11),
-    (SELECT menu_id FROM menu),
+    tableID int(11),
+    (SELECT menuID FROM Menu) as menuID,
     quantity int(11),
-    Primary key (id, menu_id)
+    Primary key (id, menuID)
 );
 
-CREATE TABLE transaction_table (
+CREATE TABLE Transaction_table (
     id int(11) auto_increment,
-    transaction_id int(11),
-    menu_id int(3),
+    tableID int(11),
+    menuID int(3),
     quantity int(11),
-    transaction_date DATETIME DEFAULT CURRENT_TIMESTAMP,
-    Primary key (id, menu_id)
+    transactionDate DATETIME DEFAULT CURRENT_TIMESTAMP,
+    Primary key (id, menuID)
 );
 
 
 
 
 create table Menu(
-    menu_id int(3) auto_increment,
-    category_id int(1),
+    menuID int(3) auto_increment,
+    categoryID int(1),
     menu text,
     price decimal(9,2),
-    primary key(menu_id)
+    primary key(menuID)
 );
 
 -- 101 ~ 
 insert into Menu(
-	menu_id,
-    category_id,
+	menuID,
+    categoryID,
     menu,
     price
 )
@@ -67,7 +58,7 @@ values
 (101,1,"Plain",350);
 
 insert into Menu(
-    category_id,
+    categoryID,
     menu,
     price
 )
@@ -77,10 +68,10 @@ values
 (1,"100g Chicken fillet",400);
 
 
--- change menu_Id to 201
+-- change menuID to 201
 insert into Menu(
-    menu_id,
-    category_id,
+    menuID,
+    categoryID,
     menu,
     price
 )
@@ -90,7 +81,7 @@ values
 
 -- insert data
 insert into Menu(
-    category_id,
+    categoryID,
     menu,
     price
 )
@@ -101,8 +92,8 @@ values
 
 -- change to 301
 insert into Menu(
-    menu_id,
-    category_id,
+    menuID,
+    categoryID,
     menu,
     price
 )
@@ -111,7 +102,7 @@ values
 
 -- insert data
 insert into Menu(
-    category_id,
+    categoryID,
     menu,
     price
 )
@@ -123,8 +114,8 @@ values
 
 -- change into 401
 insert into Menu(
-    menu_id,
-    category_id,
+    menuID,
+    categoryID,
     menu,
     price
 )
@@ -133,7 +124,7 @@ values
 
 -- insert DATA
 insert into Menu(
-    category_id,
+    categoryID,
     menu,
     price
 )
@@ -143,8 +134,8 @@ values
 
 -- change into 501
 insert into Menu(
-    menu_id,
-    category_id,
+    menuID,
+    categoryID,
     menu,
     price
 )
@@ -153,7 +144,7 @@ values
 
 -- insert DATA
 insert into Menu(
-    category_id,
+    categoryID,
     menu,
     price
 )
@@ -165,8 +156,8 @@ values
 
 -- change into 601
 insert into Menu(
-    menu_id,
-    category_id,
+    menuID,
+    categoryID,
     menu,
     price
 )
@@ -175,7 +166,7 @@ values
 
 -- insert DATA
 insert into Menu(
-    category_id,
+    categoryID,
     menu,
     price
 )
@@ -190,8 +181,8 @@ values
 
 -- change into 701
 insert into Menu(
-    menu_id,
-    category_id,
+    menuID,
+    categoryID,
     menu,
     price
 )
@@ -200,7 +191,7 @@ values
 
 -- insert DATA
 insert into Menu(
-    category_id,
+    categoryID,
     menu,
     price
 )
@@ -212,8 +203,8 @@ values
 
 -- change into 801
 insert into Menu(
-	menu_id,
-    category_id,
+	menuID,
+    categoryID,
     menu,
     price
 )
@@ -221,7 +212,7 @@ values
 (801,8,	"Jjajangmyun chicken",	200);
 
 insert into Menu(
-    category_id,
+    categoryID,
     menu,
     price
 )
@@ -240,8 +231,8 @@ values
 
 -- change into 901
 insert into Menu(
-    menu_id,
-    category_id,
+    menuID,
+    categoryID,
     menu,
     price
 )
@@ -250,7 +241,7 @@ values
 
 -- insert data
 insert into Menu(
-    category_id, 
+    categoryID, 
     menu,
     price
 )
@@ -268,52 +259,3 @@ values
 (9,	"Fried porkchop",	140),
 (9,	"Spicy chicken fillet",	165),
 (9,	"Fried chicken fillet",	140);
-<<<<<<< HEAD:main.sql
-=======
-
-create table Category (
-    CategoryID int(11) auto_increment,
-    CategoryName varchar(255),
-    Primary key (CategoryID)
-);
-
-insert into 
-    Category (CategoryName) 
-    values 
-    ('Samgyupsal'),
-    ('Set meal'),
-    ('Chicken'),
-    ('Pulutan'),
-    ('Fries'),
-    ('Mandu'),
-    ('Special dish');
-
-insert into 
-    Menu (CategoryID, Menu, Price) 
-values
-    ('1','Plain','350'),
-    ('1','Bulgogi','380'),
-    ('1','Spicy','390'),
-    ('1','100g chicken fillet','400');
-
-
-SELECT Order_List.OrderId, Order_List.MenuID from Order_List
-
-Create table transaction_orders (
-    id int(11) auto_increment,
-    transaction_id int(11),
-    (SELECT menu_id FROM menu),
-    quantity int(11),
-    Primary key (id, menu_id)
-);
-
-CREATE TABLE transaction_table (
-    id int(11) auto_increment,
-    transaction_id int(11),
-    menu_id int(3),
-    quantity int(11),
-    transaction_date DATETIME DEFAULT CURRENT_TIMESTAMP,
-    Primary key (id, menu_id)
-);
-
->>>>>>> e0b37be2e303cb0d670ee92ce20fc3e1f9789891:sql.sql
