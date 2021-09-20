@@ -263,3 +263,4 @@ CREATE TABLE transaction_table (
     transaction_date DATETIME DEFAULT CURRENT_TIMESTAMP,
     Primary key (id, menu_id)
 );
+
