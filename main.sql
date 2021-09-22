@@ -36,7 +36,14 @@ CREATE TABLE Transaction_table (
     Primary key (id, menuID)
 );
 
-
+CREATE TABLE Sales (
+    id int(11) auto_increment,
+    tableID int(11),
+    menuID int(3),
+    quantity int(11),
+    transactionDate DATETIME DEFAULT CURRENT_TIMESTAMP,
+    Primary key (id, menuID)
+);
 
 
 create table Menu(

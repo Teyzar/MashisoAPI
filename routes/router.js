@@ -47,11 +47,18 @@ router.post('/api/order', function (req, res, err) {
 
     let sql = "Insert into transaction_table (tableID, menuID, quantity) VALUES (?,?,?)";
 
-    db.query(sql, [tableID, menuID, quantity], function (err, result, fields) {
+    let insertSalesTable = "INSERT INTO Sales (tableID, menuID, quantity) SELECT tableID, menuID, quantity FROM transaction_table  WHERE transactionDate = CURRENT_TIMESTAMP";
+
+    let query = db.query(sql, [tableID, menuID, quantity], function (err, result, fields) {
         if (err) throw err;
         res.json(result);
     });
+
+    if (query) {
+        db.query(insertSalesTable);
+    }
 })
+
 
 //update orders
 router.put('/api/order/:id', function (req, res, err) {
@@ -62,12 +69,20 @@ router.put('/api/order/:id', function (req, res, err) {
 
     let sql = "UPDATE transaction_table SET ? WHERE ?";
 
+    let SalesTable = "UPDATE sales SET ? WHERE ?";
+
     let data = [{ tableID: tableID, menuID: menuID, quantity: quantity }, { id: id }]
 
-    db.query(sql, data, function (err, result, fields) {
+    let query = db.query(sql, data, function (err, result, fields) {
         if (err) throw err;
-        res.json(result);
     });
+
+    if (query) {
+        db.query(SalesTable, data, function (err, result, fields) {
+            if (err) throw err;
+            res.json(result);
+        });
+    }
 })
 //delete inserted order by id
 router.delete('/api/order/:id', function (req, res, err) {
@@ -90,13 +105,22 @@ router.delete('/api/order/:id', function (req, res, err) {
     }
 })
 
+// to delete all list in trasaction_table
+router.delete('/api/order', function (req, res)  {
+    let sql = "DELETE FROM transaction_table";
+
+    db.query(sql, function(err, result) {
+        if(err) throw err;
+        res.json(result);
+    })
+})
+
 //getting the list of orders
 router.get('/api/orderlist', (req, res) => {
-    let sql = "SELECT transaction_table.tableID, transaction_table.menuID, Menu.menu AS item, transaction_table.quantity, (transaction_table.quantity*Menu.price) AS price, transaction_table.transaction_date FROM transaction_table INNER JOIN Menu on transaction_table.menuID=Menu.menuID";
+    let sql = `SELECT tb.tableID, tb.menuID, Menu.menu AS item, tb.quantity, Menu.price, tb.transactionDate FROM transaction_table tb INNER JOIN Menu on tb.menuID=Menu.menuID`;
     db.query(sql, function (err, result, fields) {
         if (err) throw err;
         res.json(result);
-
     });
 })
 
@@ -168,6 +192,47 @@ router.get('/api/sales', (req,res) => {
         res.json(result);
     });    
 }) 
+
+//get all total day sales
+router.get('/api/daysales', (req,res) => {
+    let tableID = req.params.tableID;
+    let sql = `
+    SELECT 
+    id,tableID, s.menuID, Menu.price, s.quantity, (Menu.Price*(s.quantity)) as 'Total'
+    FROM
+        Sales s
+    INNER JOIN
+        Menu
+    ON 
+        s.menuID=Menu.menuID`;
+    db.query(sql,function (err, result, fields) { 
+        if (err) throw err;
+        res.json(result);
+    });    
+}) 
+
+//get total sales by date, input date format should be  year-month-day and also you can type just by year
+router.get('/api/daysales/:transactionDate', (req,res) => {
+    let transactionDate = req.params.transactionDate;
+    let sql = `
+    SELECT 
+        s.tableID, s.menuID, Menu.price, sum(s.quantity) as quantity, (Menu.Price*(sum(s.quantity))) as 'Total each', s.transactionDate
+    FROM 
+        Sales s
+    INNER JOIN
+        Menu
+    ON
+        s.menuID=Menu.menuID
+    WHERE
+        s.transactionDate LIKE '%${transactionDate}%'
+    GROUP by
+        s.menuID, s.quantity, s.tableID, s.transactionDate`;
+
+    db.query(sql,function (err, result, fields) { 
+        if (err) throw err;
+        res.json(result);
+    });    
+})
 
 
 module.exports = router;
