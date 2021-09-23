@@ -1,3 +1,4 @@
+const { query } = require('express');
 const express = require('express');
 const router = express.Router();
 require('dotenv').config();
@@ -84,35 +85,106 @@ router.put('/api/order/:id', function (req, res, err) {
         });
     }
 })
-//delete inserted order by id
-router.delete('/api/order/:id', function (req, res, err) {
+//delete inserted order by id when customer wants to cancel order.
+router.delete('/api/cancelorder/:id', function (req, res, err) {
     let id = req.params.id;
 
-    let sql = "DELETE FROM transaction_table WHERE ?";
-    let checkdata = "SELECT COUNT(*) FROM transaction_table WHERE id = (SELECT id FROM transaction_table LIMIT 1)";
-    let autoincrement = "ALTER TABLE transaction_table AUTO_INCREMENT=0";
-    let increment = "UPDATE transaction_table set id = id-1 WHERE id>?";
+    let tb = "DELETE FROM transaction_table WHERE ?";
+    let sales = "DELETE FROM Sales WHERE ?";
+
+    let checkdata_tb = "SELECT COUNT(*) FROM transaction_table WHERE id = (SELECT id FROM transaction_table LIMIT 1)";
+    let autoincrement_tb = "ALTER TABLE transaction_table AUTO_INCREMENT=0";
+    let increment_tb = "UPDATE transaction_table set id = id-1 WHERE id>?";
+
+    let checkdata_s = "SELECT COUNT(*) FROM Sales WHERE id = (SELECT id FROM Sales LIMIT 1)";
+    let autoincrement_s = "ALTER TABLE Sales AUTO_INCREMENT=0";
+    let increment_s = "UPDATE Sales set id = id-1 WHERE id>?";
 
     let data = [{ id: id }];
 
-    let del = db.query(sql, data);
-    let check = db.query(checkdata);
+    let del_tb = db.query(tb, data);
+    let del_S = db.query(sales, data);
+
+    let checktb = db.query(checkdata_tb);
+    let checkS = db.query(checkdata_s);
+
+    if (del_tb || checktb && del_S || checkS) {
+        db.query(autoincrement_tb);
+        db.query(autoincrement_s);
+        db.query(increment_tb, id);
+        db.query(increment_s, id);
+        res.send({ message: "delete was succesful" })
+    }
+})
+
+//to clear the order by tableID per tableID Transaction
+router.delete('/api/tableID/:tableID', function (req, res)  {
+
+    let tableID = req.params.tableID;
+
+    
+    let id = "SELECT COUNT(*) FROM transaction_table WHERE id = (SELECT id FROM transaction_table LIMIT 1)";
+    let sql = `DELETE FROM transaction_table WHERE tableID=${tableID}`;
+    let countTableID = `select @ROWCOUNT`;
+    
+    let getIds = `SELECT id FROM transaction_table WHERE tableID = ${tableID}`;
+    let del = db.query(sql);
+    let check = db.query(id);
+    
+    let nums= db.query(countTableID);
+    let ids = db.query(getIds);
+
+    let autoincrement = 'ALTER TABLE transaction_table AUTO_INCREMENT=0'
+
+    
+    
+    let updateID = `UPDATE transaction_table set id = id-${countTableID} WHERE id > 3`;
+
+
 
     if (del || check) {
-        db.query(autoincrement);
-        db.query(increment, id);
-        res.send({ message: "delete was succesful" })
+        db.query(autoincrement, function(err, result) {
+            if (err) throw err;
+            res.json(result); 
+        })
+        db.query(updateID); 
     }
 })
 
 // to delete all list in trasaction_table
 router.delete('/api/order', function (req, res)  {
     let sql = "DELETE FROM transaction_table";
+    let id = "SELECT COUNT(*) FROM transaction_table WHERE id = (SELECT id FROM transaction_table LIMIT 0)";
+    let autoincrement = 'ALTER TABLE transaction_table AUTO_INCREMENT=1'
 
-    db.query(sql, function(err, result) {
-        if(err) throw err;
-        res.json(result);
-    })
+    let del = db.query(sql);
+
+    let check = db.query(id);
+
+    if (del || check) {
+        db.query(autoincrement, function(err, result) {
+            if (err) throw err;
+            res.json(result);
+        })
+    }
+})
+
+//to delete all list in Sales table
+router.delete('/api/sales', function (req, res)  {
+    let sql = "DELETE FROM Sales";
+    let id = "SELECT COUNT(*) FROM Sales WHERE id = (SELECT id FROM Sales LIMIT 0)";
+    let autoincrement = 'ALTER TABLE Sales AUTO_INCREMENT=1'
+
+    let del = db.query(sql);
+
+    let check = db.query(id);
+
+    if (del || check) {
+        db.query(autoincrement, function(err, result) {
+            if (err) throw err;
+            res.json(result);
+        })
+    }
 })
 
 //getting the list of orders
@@ -133,6 +205,7 @@ router.get('/api/orderlist/:tableID', (req, res) => {
         res.json(result);
     });
 })
+
 //geting the list of menus
 router.get('/api/menu', (req, res) => {
     let sql = "SELECT * FROM Menu";
@@ -141,6 +214,7 @@ router.get('/api/menu', (req, res) => {
         res.send(result);
     })
 })
+
 //getting list of menu by id
 router.get('/api/menu/:menuID', (req, res) => {
     let menuID = req.params.menuID;
