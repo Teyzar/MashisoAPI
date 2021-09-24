@@ -123,32 +123,32 @@ router.delete('/api/tableID/:tableID', function (req, res)  {
     let tableID = req.params.tableID;
 
     
-    let id = "SELECT COUNT(*) FROM transaction_table WHERE id = (SELECT id FROM transaction_table LIMIT 1)";
+    let id = "SELECT COUNT(*) FROM transaction_table WHERE id = (SELECT id FROM transaction_table LIMIT 0)";
     let sql = `DELETE FROM transaction_table WHERE tableID=${tableID}`;
-    let countTableID = `select @ROWCOUNT`;
-    
-    let getIds = `SELECT id FROM transaction_table WHERE tableID = ${tableID}`;
-    let del = db.query(sql);
-    let check = db.query(id);
-    
-    let nums= db.query(countTableID);
-    let ids = db.query(getIds);
+    let countTableID = `SELECT count(*) as num FROM transaction_table WHERE tableID = ${tableID}`;
+    let autoincrement = 'ALTER TABLE transaction_table AUTO_INCREMENT=1'
 
-    let autoincrement = 'ALTER TABLE transaction_table AUTO_INCREMENT=0'
+  db.query(countTableID, function(err, result, fields) {
+        if (err) throw err;
+        let count = result[0]['num'];
+        
+        db.query(`select id from transaction_table where tableID = ${tableID}`, function (err,result) {
+            let update = result[0]['id'];
 
-    
-    
-    let updateID = `UPDATE transaction_table set id = id-${countTableID} WHERE id > 3`;
-
-
-
-    if (del || check) {
-        db.query(autoincrement, function(err, result) {
-            if (err) throw err;
-            res.json(result); 
-        })
-        db.query(updateID); 
-    }
+        if (db.query(sql) || db.query(id)) {
+            db.query(autoincrement, function(err, result) {
+                if (err) throw err;
+                res.json(result); 
+            })    
+            db.query(`UPDATE transaction_table set id = id-${count} where id > ${update-1}`);
+            db.query('SELECT MAX(id) as id from transaction_table', function(err, result) {
+                if (err) throw err;
+                let max = result[0]['id'];
+                db.query(`ALTER TABLE transaction_table AUTO_INCREMENT = ${max}`);
+            });
+            }
+        }) 
+    });
 })
 
 // to delete all list in trasaction_table
@@ -165,7 +165,7 @@ router.delete('/api/order', function (req, res)  {
         db.query(autoincrement, function(err, result) {
             if (err) throw err;
             res.json(result);
-        })
+        }) 
     }
 })
 
