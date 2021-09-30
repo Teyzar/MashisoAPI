@@ -189,7 +189,7 @@ router.delete('/api/sales', function (req, res)  {
 
 //getting the list of orders
 router.get('/api/orderlist', (req, res) => {
-    let sql = `SELECT tb.tableID, tb.menuID, Menu.menu AS item, tb.quantity, Menu.price, tb.transactionDate FROM transaction_table tb INNER JOIN Menu on tb.menuID=Menu.menuID`;
+    let sql = `SELECT id, tb.tableID, tb.menuID, Menu.menu AS item, tb.quantity, Menu.price, tb.transactionDate FROM transaction_table tb INNER JOIN Menu on tb.menuID=Menu.menuID`;
     db.query(sql, function (err, result, fields) {
         if (err) throw err;
         res.json(result);
@@ -199,9 +199,19 @@ router.get('/api/orderlist', (req, res) => {
 //getting the list of orders by transcation id's
 router.get('/api/orderlist/:tableID', (req, res) => {
     let tableID = req.params.tableID;
-    let sql = "SELECT transaction_table.tableID, transaction_table.menuID, Menu.menu AS item, transaction_table.quantity, Menu.price, transaction_table.transaction_date FROM transaction_table INNER JOIN Menu on transaction_table.menuID=Menu.menuID AND transaction_table.tableID=(?)";
+    let sql = `
+    SELECT 
+        id,transaction_table.tableID, transaction_table.menuID, Menu.menu AS item, transaction_table.quantity, Menu.price, transaction_table.transactionDate 
+    FROM 
+        transaction_table 
+    INNER JOIN 
+        Menu 
+    ON 
+        transaction_table.menuID=Menu.menuID  
+    AND 
+        transaction_table.tableID=(?)`;
     db.query(sql, tableID, function (err, result, fields) {
-        if (err) throw err;
+        if (err) throw err; 
         res.json(result);
     });
 })
@@ -230,7 +240,7 @@ router.get('/api/sales/:tableID', (req,res) => {
     let tableID = req.params.tableID;
     let sql = `
     SELECT 
-        transaction_table.tableID, transaction_table.menuID, Menu.price, sum(transaction_table.quantity) as quantity, (Menu.Price*(sum(transaction_table.quantity))) as 'Total each'
+        id,transaction_table.tableID, transaction_table.menuID, Menu.price, sum(transaction_table.quantity) as quantity, (Menu.Price*(sum(transaction_table.quantity))) as 'Total each'
     FROM 
         transaction_table
     INNER JOIN
@@ -240,7 +250,7 @@ router.get('/api/sales/:tableID', (req,res) => {
     WHERE
         transaction_table.tableID = ${tableID}
     GROUP by
-        transaction_table.menuID, transaction_table.quantity`;
+        transaction_table.menuID, transaction_table.quantity, id`;
 
     db.query(sql,function (err, result, fields) { 
         if (err) throw err;
@@ -252,7 +262,7 @@ router.get('/api/sales/:tableID', (req,res) => {
 router.get('/api/sales', (req,res) => {
     let tableID = req.params.tableID;
     let sql = `
-    SELECT 
+    SELECT  
     id,tableID, transaction_table.menuID, Menu.price, transaction_table.quantity, (Menu.Price*(transaction_table.quantity)) as 'Total'
     FROM
         transaction_table
@@ -290,7 +300,7 @@ router.get('/api/daysales/:transactionDate', (req,res) => {
     let transactionDate = req.params.transactionDate;
     let sql = `
     SELECT 
-        s.tableID, s.menuID, Menu.price, sum(s.quantity) as quantity, (Menu.Price*(sum(s.quantity))) as 'Total each', s.transactionDate
+        id,s.tableID, s.menuID, Menu.price, sum(s.quantity) as quantity, (Menu.Price*(sum(s.quantity))) as 'Total each', s.transactionDate
     FROM 
         Sales s
     INNER JOIN
@@ -300,7 +310,7 @@ router.get('/api/daysales/:transactionDate', (req,res) => {
     WHERE
         s.transactionDate LIKE '%${transactionDate}%'
     GROUP by
-        s.menuID, s.quantity, s.tableID, s.transactionDate`;
+        s.menuID, s.quantity, s.tableID, s.transactionDate, id`;
 
     db.query(sql,function (err, result, fields) { 
         if (err) throw err;
