@@ -72,7 +72,7 @@ router.put('/api/order/:id', function (req, res, err) {
 
     let SalesTable = "UPDATE sales SET ? WHERE ?";
 
-    let data = [{ tableID: tableID, menuID: menuID, quantity: quantity }, { id: id }]
+    let data = [{ quantity: quantity }, { id: id }]
 
     let query = db.query(sql, data, function (err, result, fields) {
         if (err) throw err;
